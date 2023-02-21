@@ -1,0 +1,26 @@
+enable_testing()
+include(GoogleTest)
+
+add_executable(
+        singly_linked_gtest
+        singly_linked_gtest.cpp
+)
+target_link_libraries(
+        singly_linked_gtest
+        PUBLIC
+        singly_linked_list
+        gtest
+        gtest_main
+)
+target_compile_options(
+        singly_linked_gtest
+        PUBLIC
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wformat
+        -Wvla
+        -Wfloat-equal
+        -Werror
+)
+gtest_discover_tests(singly_linked_gtest)

@@ -7,5 +7,5 @@ add_library(
 target_include_directories(
         cdll
         PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/circular_double/include
 )
