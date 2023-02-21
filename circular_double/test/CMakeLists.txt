@@ -2,18 +2,18 @@ enable_testing()
 include(GoogleTest)
 
 add_executable(
-        doubly_linked_gtest
-        doubly_linked_gtest.cpp
+        cdll_gtest
+        cdll_gtest.cpp
 )
 target_link_libraries(
-        doubly_linked_gtest
+        cdll_gtest
         PUBLIC
-        doubly_linked_list
+        cdll
         gtest
         gtest_main
 )
 target_compile_options(
-        doubly_linked_gtest
+        cdll_gtest
         PUBLIC
         -Wall
         -Wextra
@@ -23,4 +23,4 @@ target_compile_options(
         -Wfloat-equal
         -Werror
 )
-gtest_discover_tests(doubly_linked_gtest)
+gtest_discover_tests(cdll_gtest)
