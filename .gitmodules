@@ -7,3 +7,6 @@
 [submodule "circular_double/deps/googletest"]
 	path = circular_double/deps/googletest
 	url = https://github.com/google/googletest.git
+[submodule "thread_pool/deps/googletest"]
+	path = thread_pool/deps/googletest
+	url = https://github.com/google/googletest.git
