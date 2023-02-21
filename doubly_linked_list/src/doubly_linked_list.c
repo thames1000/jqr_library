@@ -479,6 +479,7 @@ void bubble_sort(linked_list_t * my_list)
 {
     list_node_t * temp_node = my_list->head;
     int continuation = 0;
+    int count = 1;
     do
     {
         int response = my_list->compare_func(temp_node->data, temp_node->next->data);
@@ -489,7 +490,8 @@ void bubble_sort(linked_list_t * my_list)
             continuation = 1;
         }
         temp_node = temp_node->next;
-    } while (NULL != temp_node->next);
+        count++;
+    } while (count < my_list->size);
     if (1 == continuation)
     {
         print_list(my_list);
@@ -503,9 +505,11 @@ void bubble_sort(linked_list_t * my_list)
 void reset_tail(linked_list_t * my_list)
 {
     list_node_t * node = my_list->head;
-    while (NULL!=node->next)
+    int count = 1;
+    while (count < my_list->size)
     {
         node=node->next;
+        count++;
     }
     my_list->tail=node;
 }
@@ -683,9 +687,10 @@ void insertion_sort(linked_list_t * my_list)
     list_node_t * curr_node = last_sorted->next;
     list_node_t * temp;
     list_node_t * check_node;
-    list_node_t *  prev_check;
+    list_node_t * prev_check;
     for (unsigned int i = 0; i < my_list->size-1;i++)
     {
+        
         
         int result=my_list->compare_func(last_sorted->data,curr_node->data);
         if (result>0)
