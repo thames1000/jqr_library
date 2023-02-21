@@ -4,3 +4,6 @@
 [submodule "doubly_linked_list/deps/googletest"]
 	path = doubly_linked_list/deps/googletest
 	url = https://github.com/google/googletest.git
+[submodule "circular_double/deps/googletest"]
+	path = circular_double/deps/googletest
+	url = https://github.com/google/googletest.git

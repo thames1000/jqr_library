@@ -70,6 +70,20 @@ int size_of_list(linked_list_t * my_list, unsigned int * list_size)
     return err_check;
 }
 
+list_node_t * create_node(void * data)
+{
+    list_node_t * new_node = calloc(1, sizeof(list_node_t));
+    if (NULL == new_node)
+    {
+        goto END;
+    }
+    new_node->data = data;
+    new_node->next = NULL;
+    
+END:
+    return new_node;
+}
+
 //******************************************************************************
 // ALL THE PUSH FUNCTIONS
 
@@ -82,20 +96,20 @@ int push_head(linked_list_t * my_list, void * data)
         return err_check;
     }
     err_check = 0;
-    list_node_t * new_node = calloc(1, sizeof(list_node_t));
-    new_node->data = data;
-    new_node->next = my_list->head;
-    new_node->prev = NULL;
-    if (NULL != new_node->next)
+    list_node_t * new_node = create_node(data);
+    if (NULL == my_list->head)
     {
-        new_node->next->prev = new_node;
-    }
-
-    if (empty)
-    {
+        my_list->head = new_node;
         my_list->tail = new_node;
+        my_list->tail->next = my_list->head;
+        my_list->head->prev = my_list->tail;
     }
-    my_list->head = new_node;
+    else
+    {
+        new_node->next = my_list->tail->next;
+        my_list->tail->next = new_node;
+        my_list->head = new_node;
+    }
     my_list->size++;
     return err_check;
 }
@@ -106,17 +120,18 @@ int push_tail(linked_list_t * my_list, void * data)
     int err_check = empty_check(my_list, &empty);
     if (-1 != err_check)
     {
-        list_node_t * new_node = calloc(1, sizeof(list_node_t));
-        new_node->data = data;
-        new_node->next = NULL;
-        new_node->prev = my_list->tail;
+        list_node_t * new_node = create_node(data);
         if (empty)
         {
+            new_node->next = new_node;
+            new_node->prev = new_node;
             my_list->head = new_node;
             my_list->tail = new_node;
         }
         else
         {
+            new_node->prev = my_list->tail;
+            new_node->next = my_list->head;
             my_list->tail->next = new_node;
             my_list->tail = new_node;
         }
@@ -133,50 +148,46 @@ int push_position(linked_list_t * my_list, void * data, unsigned int position)
     {
         err_check = -1;
     }
+    else if (1 == position)
+    {
+        push_head(my_list, data);
+    }
     else
     {
-        list_node_t * new_node = calloc(1, sizeof(list_node_t));
-        new_node->data = data;
-        new_node->next = NULL;
-        new_node->prev = NULL;
-        if (empty && (1 == position))
+        list_node_t * new_node = create_node(data);
+        unsigned int size = 0;
+        unsigned int index = 2;
+        list_node_t * node = my_list->head;
+        err_check = size_of_list(my_list, &size);
+        if ((-1 == err_check) || (size + 1 < position))
         {
-            my_list->head = new_node;
-            my_list->tail = new_node;
+            err_check = -1;
+            if (NULL != my_list->free_func)
+                my_list->free_func(new_node->data);
+            free(new_node);
+            goto END;
         }
-        else
+        else if (size + 1 == position)
         {
-            unsigned int size = 0;
-            unsigned int index = 2;
-            list_node_t * node = my_list->head;
-            err_check = size_of_list(my_list, &size);
-            if ((-1 == err_check) || (size + 1 < position))
-            {
-                err_check = -1;
-                if (NULL != my_list->free_func)
-                    my_list->free_func(new_node->data);
-                free(new_node);
-                return err_check;
-            }
+            push_tail(my_list, data);
+            goto END;
+        }
 
-            while (position > index)
-            {
-                node = node->next;
-                index++;
-            }
-            list_node_t * temp_node = node->next;
-            node->next = new_node;
-            new_node->data = data;
-            new_node->next = temp_node;
-            new_node->prev = node;
-            temp_node->prev = new_node;
-            if (size + 1 == position)
-            {
-                my_list->tail = new_node;
-            }
+        while (position > index)
+        {
+            node = node->next;
+            index++;
         }
+        list_node_t * temp_node = node->next;
+        node->next = new_node;
+        new_node->data = data;
+        new_node->next = temp_node;
+        new_node->prev = node;
+        temp_node->prev = new_node;
+        
         my_list->size++;
     }
+END:
     return err_check;
 }
 
@@ -407,15 +418,17 @@ void print_list(linked_list_t * my_list)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
+    int temp_size = my_list->size;
     printf("[");
     if (!empty && -1 != err_check)
     {
         list_node_t * node = my_list->head;
-        while (NULL != node->next)
+        while (temp_size > 1)
         {
             my_list->print_func(node->data);
             printf(", ");
             node = node->next;
+            temp_size--;
         }
         my_list->print_func(node->data);
     }
@@ -430,7 +443,7 @@ void clear_list(linked_list_t ** my_list)
         return;
     }
 
-    while (NULL != (*my_list)->head)
+    while ((*my_list)->size > 1)
     {
         list_node_t * temp = (*my_list)->head;
 

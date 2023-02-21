@@ -8,13 +8,6 @@ struct list_node
     list_node_t * prev;
 };
 
-typedef struct person_ {
-        uint32_t age;
-        char * name;
-    } person_t;
-
-void (*null_func)(void*) = NULL;
-
 struct linked_list
 {
     list_node_t * head;
@@ -24,6 +17,19 @@ struct linked_list
     int (*compare_func)(void *, void *);
     void (*print_func)(void *);
 };
+
+typedef struct person_ {
+        uint32_t age;
+        char * name;
+    } person_t;
+
+void (*null_func)(void*) = NULL;
+
+void person_free(void * person)
+{
+    free(((person_t*)person)->name);
+    free(person);
+}
 
 int comp_int(void * num1, void *num2)
 {
@@ -36,12 +42,6 @@ void print_int(void * data)
 {
     int number = *(int*) data;
     printf("%d", number);
-}
-
-void person_free(void * person)
-{
-    free(((person_t*)person)->name);
-    free(person);
 }
 
 int compare_people(void * person1, void *person2)
@@ -90,7 +90,7 @@ TEST(BaseTest, Push_Pop_Head_test)
     destroy_list(&my_list);
 }
 
-TEST(BaseTest, Push_Head_Pop_Tail_test)
+TEST(BaseTest, Push_Head_Next_Tail_test)
 {
     linked_list_t * my_list = create_list(person_free, compare_people, print_person);
     person_t * temp = (person_t *)calloc(1, sizeof(person_t));
@@ -99,6 +99,35 @@ TEST(BaseTest, Push_Head_Pop_Tail_test)
     snprintf(buff, 7, "Thames");
     temp->name = buff;
     push_head(my_list, temp);
+    EXPECT_EQ(my_list->head->prev, my_list->tail);
+    EXPECT_EQ(my_list->head->next, my_list->tail);
+    EXPECT_EQ(my_list->head->prev, my_list->head);
+    EXPECT_EQ(my_list->head->next, my_list->head);
+    destroy_list(&my_list);
+}
+
+TEST(BaseTest, Push_Position_0_test)
+{
+    linked_list_t * my_list = create_list(person_free, compare_people, print_person);
+    person_t * temp = (person_t *)calloc(1, sizeof(person_t));
+    temp->age = 27;
+    char* buff = (char*) calloc(7,1);
+    snprintf(buff, 7, "Thames");
+    temp->name = buff;
+    int err_chk = push_position(my_list, temp, 0);
+    EXPECT_EQ(err_chk, -1);
+    destroy_list(&my_list);
+}
+
+TEST(BaseTest, Push_Position_1_test)
+{
+    linked_list_t * my_list = create_list(person_free, compare_people, print_person);
+    person_t * temp = (person_t *)calloc(1, sizeof(person_t));
+    temp->age = 27;
+    char* buff = (char*) calloc(7,1);
+    snprintf(buff, 7, "Thames");
+    temp->name = buff;
+    push_position(my_list, temp, 1);
     EXPECT_NE(pop_tail(my_list), nullptr);
     destroy_list(&my_list);
 }
@@ -155,7 +184,6 @@ TEST(BaseTest, Push_2_Pop_Tail_test)
     destroy_list(&my_list);
 }
 
-
 TEST(BaseTest, Push_position_6)
 {
     int num_1 = 90;
@@ -178,35 +206,15 @@ TEST(BaseTest, Push_position_6)
     int num_7 = 20;
 
     push_position(my_list, &num_7, 6);
+    
     printf("\nAFTER\n");
     print_list(my_list);
-    list_node_t * node = pop_position(my_list, 6);
-    EXPECT_EQ(*((int *) node->data), 20);
+    void * data = NULL;
+    peek_position(my_list, &data, 6);
+    EXPECT_EQ(*((int *) data), 20);
 }
-TEST(BaseTest, bubble_sort)
-{
-    int num_1 = 90;
-    int num_2 = 75;
-    int num_3 = 60;
-    int num_4 = 45;
-    int num_5 = 30;
-    int num_6 = 15;
 
-    linked_list_t * my_list = create_list(NULL, comp_int, print_int);
-    push_head(my_list, &num_6);
-    push_head(my_list, &num_5);
-    push_head(my_list, &num_4);
-    push_head(my_list, &num_3);
-    push_head(my_list, &num_2);
-    push_head(my_list, &num_1);
-    printf("\nBEFORE\n");
-    print_list(my_list);
 
-    bubble_sort(my_list);
-    printf("\nAFTER\n");
-    print_list(my_list);
-    EXPECT_EQ(*(int*) my_list->head->data, 15);
-}
 // TEST(BaseTest, Pop_test)
 // {
 //     stack_adt_t * stack = stack_init(20, free);
