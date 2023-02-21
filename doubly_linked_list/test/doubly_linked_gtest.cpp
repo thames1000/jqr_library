@@ -207,46 +207,53 @@ TEST(BaseTest, bubble_sort)
     print_list(my_list);
     EXPECT_EQ(*(int*) my_list->head->data, 15);
 }
-// TEST(BaseTest, Pop_test)
-// {
-//     stack_adt_t * stack = stack_init(20, free);
-//     char buff[30];
-//     for (int index = 0; index < 25; index++) // Does not push if stack is full
-//     {
-//         snprintf(buff, 30, "Hello world: %d\n", index);
-//         stack_push(stack, strdup(buff));
-//     }
-//     void * tester = stack_pop(stack);
-//     EXPECT_NE(tester, nullptr);
-//     free(tester);
-//     stack_destroy(stack);
-// }
 
-// TEST(BaseTest, Dump_and_pop_test)
-// {
-//     stack_adt_t * stack = stack_init(20, free);
-//     char buff[30];
-//     for (int index = 0; index < 25; index++)
-//     {
-//         snprintf(buff, 30, "Hello world: %d\n", index);
-//         stack_push(stack, strdup(buff));
-//     }
-//     stack_dump(stack);
-//     EXPECT_EQ(stack_pop(stack), nullptr);
-//     stack_destroy(stack);
-// }
+TEST(BaseTest, selection_sort)
+{
+    int num_1 = 90;
+    int num_2 = 75;
+    int num_3 = 60;
+    int num_4 = 45;
+    int num_5 = 30;
+    int num_6 = 15;
 
-// TEST(BaseTest, struct_object_push_and_destroy)
-// {
-//     stack_adt_t * stack = stack_init(20, person_free);
-//     EXPECT_NE(stack, nullptr);
-    
-//     for (int index = 0; index < 15; index++)
-//     {
-//         person_t * person = (person_t*) calloc(1,sizeof(person_t));
-//         person->age=index;
-//         person->name=strdup("My Name");
-//         stack_push(stack, person);
-//     }
-//     stack_destroy(stack);
-// }
+    linked_list_t * my_list = create_list(NULL, comp_int, print_int);
+    push_head(my_list, &num_6);
+    push_head(my_list, &num_5);
+    push_head(my_list, &num_4);
+    push_head(my_list, &num_3);
+    push_head(my_list, &num_2);
+    push_head(my_list, &num_1);
+    printf("\nBEFORE\n");
+    print_list(my_list);
+
+    selection_sort(my_list);
+    printf("\nAFTER\n");
+    print_list(my_list);
+    EXPECT_EQ(*(int*) my_list->head->data, 15);
+}
+
+TEST(BaseTest, insertion_sort)
+{
+    int num_1 = 90;
+    int num_2 = 75;
+    int num_3 = 60;
+    int num_4 = 45;
+    int num_5 = 30;
+    int num_6 = 15;
+
+    linked_list_t * my_list = create_list(NULL, comp_int, print_int);
+    push_head(my_list, &num_6);
+    push_head(my_list, &num_5);
+    push_head(my_list, &num_4);
+    push_head(my_list, &num_3);
+    push_head(my_list, &num_2);
+    push_head(my_list, &num_1);
+    printf("\nBEFORE\n");
+    print_list(my_list);
+
+    insertion_sort(my_list);
+    printf("\nAFTER\n");
+    print_list(my_list);
+    EXPECT_EQ(*(int*) my_list->head->data, 15);
+}

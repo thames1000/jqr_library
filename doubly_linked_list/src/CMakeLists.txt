@@ -7,5 +7,5 @@ add_library(
 target_include_directories(
         doubly_linked_list
         PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/doubly_linked_list/include
 )
