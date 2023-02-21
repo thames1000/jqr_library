@@ -1,0 +1,26 @@
+enable_testing()
+include(GoogleTest)
+
+add_executable(
+        cdll_gtest
+        cdll_gtest.cpp
+)
+target_link_libraries(
+        cdll_gtest
+        PUBLIC
+        cdll
+        gtest
+        gtest_main
+)
+target_compile_options(
+        cdll_gtest
+        PUBLIC
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wformat
+        -Wvla
+        -Wfloat-equal
+        -Werror
+)
+gtest_discover_tests(cdll_gtest)
