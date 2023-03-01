@@ -1,11 +1,10 @@
-#ifndef SINGLY_LINKED_LIST_H
-#define SINGLY_LINKED_LIST_H
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -18,13 +17,11 @@ extern "C"
     typedef struct linked_list linked_list_t;
 
     /**
-     * @brief Create a list object
+     * @brief Create a new linked list object
      *
-     * @param free_func
-     * @param compare_func
-     * @param print_func
-     * @return linked_list_t*
+     * @return linked_list_t* pointer to the new linked list object
      */
+
     linked_list_t *create_list(void (*free_func)(void *),
                                int (*compare_func)(void *, void *),
                                void (*print_func)(void *));
@@ -32,8 +29,8 @@ extern "C"
     /**
      * @brief Check if the list is empty
      *
-     * @param my_list the list object pointer
-     * @param list_emtpy boolean pointer, value is true if empty, false if not
+     * @param my_list the list object
+     * @param list_emtpy boolean, true if empty, false if not
      * @return int, error code: 0 for success, anything else is a failure
      */
     int empty_check(linked_list_t *my_list, bool *list_empty);
@@ -186,14 +183,6 @@ extern "C"
     /**
      * @brief
      *
-     * @param node1
-     * @param node2
-     */
-    void swap_nodes(list_node_t **node1, list_node_t **node2);
-
-    /**
-     * @brief
-     *
      * @param my_list
      */
     void bubble_sort(linked_list_t *my_list);
@@ -237,4 +226,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
 #endif

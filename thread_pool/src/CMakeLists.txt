@@ -9,4 +9,5 @@ target_include_directories(
         thread_pool
         PUBLIC
         ${PROJECT_SOURCE_DIR}/thread_pool/include
+        ${PROJECT_SOURCE_DIR}/singly_linked_list/include
 )
