@@ -2,25 +2,25 @@
 
 struct list_node
 {
-    void * data;
-    list_node_t * next;
+    void *data;
+    list_node_t *next;
 };
 
 struct linked_list
 {
-    list_node_t * head;
-    list_node_t * tail;
+    list_node_t *head;
+    list_node_t *tail;
     unsigned int size;
     void (*free_func)(void *);
     int (*compare_func)(void *, void *);
     void (*print_func)(void *);
 };
 
-linked_list_t * create_list(void (*free_func)(void *),
-                    int (*compare_func)(void *, void *),
-                    void (*print_func)(void *))
+linked_list_t *create_list(void (*free_func)(void *),
+                           int (*compare_func)(void *, void *),
+                           void (*print_func)(void *))
 {
-    linked_list_t * rtn_list = calloc(1, sizeof(linked_list_t));
+    linked_list_t *rtn_list = calloc(1, sizeof(linked_list_t));
     if (NULL != rtn_list)
     {
         rtn_list->head = NULL;
@@ -34,13 +34,13 @@ linked_list_t * create_list(void (*free_func)(void *),
         {
             rtn_list->free_func = free_func;
         }
-        rtn_list->compare_func=compare_func;
-        rtn_list->print_func=print_func;
+        rtn_list->compare_func = compare_func;
+        rtn_list->print_func = print_func;
     }
     return rtn_list;
 }
 
-int empty_check(linked_list_t * my_list, bool * list_empty)
+int empty_check(linked_list_t *my_list, bool *list_empty)
 {
     int err_check = -1;
 
@@ -54,7 +54,7 @@ int empty_check(linked_list_t * my_list, bool * list_empty)
     return err_check;
 }
 
-int size_of_list(linked_list_t * my_list, unsigned int * list_size)
+int size_of_list(linked_list_t *my_list, unsigned int *list_size)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -72,7 +72,7 @@ int size_of_list(linked_list_t * my_list, unsigned int * list_size)
 //******************************************************************************
 // ALL THE PUSH FUNCTIONS
 
-int push_head(linked_list_t * my_list, void * data)
+int push_head(linked_list_t *my_list, void *data)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -81,7 +81,7 @@ int push_head(linked_list_t * my_list, void * data)
         return err_check;
     }
     err_check = 0;
-    list_node_t * new_node = calloc(1, sizeof(list_node_t));
+    list_node_t *new_node = calloc(1, sizeof(list_node_t));
     new_node->data = data;
     new_node->next = my_list->head;
     if (empty)
@@ -93,13 +93,13 @@ int push_head(linked_list_t * my_list, void * data)
     return err_check;
 }
 
-int push_tail(linked_list_t * my_list, void * data)
+int push_tail(linked_list_t *my_list, void *data)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     if (-1 != err_check)
     {
-        list_node_t * new_node = calloc(1, sizeof(list_node_t));
+        list_node_t *new_node = calloc(1, sizeof(list_node_t));
         new_node->data = data;
         new_node->next = NULL;
         if (empty)
@@ -117,7 +117,7 @@ int push_tail(linked_list_t * my_list, void * data)
     return err_check;
 }
 
-int push_position(linked_list_t * my_list, void * data, unsigned int position)
+int push_position(linked_list_t *my_list, void *data, unsigned int position)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -127,7 +127,7 @@ int push_position(linked_list_t * my_list, void * data, unsigned int position)
     }
     else
     {
-        list_node_t * new_node = calloc(1, sizeof(list_node_t));
+        list_node_t *new_node = calloc(1, sizeof(list_node_t));
         new_node->data = data;
         new_node->next = NULL;
         if (empty && (1 == position))
@@ -139,7 +139,7 @@ int push_position(linked_list_t * my_list, void * data, unsigned int position)
         {
             unsigned int size = 0;
             unsigned int index = 2;
-            list_node_t * node = my_list->head;
+            list_node_t *node = my_list->head;
             err_check = size_of_list(my_list, &size);
             if ((-1 == err_check) || (size + 1 < position))
             {
@@ -155,7 +155,7 @@ int push_position(linked_list_t * my_list, void * data, unsigned int position)
                 node = node->next;
                 index++;
             }
-            list_node_t * temp_node = node->next;
+            list_node_t *temp_node = node->next;
             node->next = new_node;
             new_node->data = data;
             new_node->next = temp_node;
@@ -172,7 +172,7 @@ int push_position(linked_list_t * my_list, void * data, unsigned int position)
 //******************************************************************************
 // ALL THE PEEK FUNCTIONS
 
-int peek_head(linked_list_t * my_list, void ** see_data)
+int peek_head(linked_list_t *my_list, void **see_data)
 {
     int err_check = -1;
     if ((NULL == my_list) || (NULL == see_data))
@@ -187,7 +187,7 @@ int peek_head(linked_list_t * my_list, void ** see_data)
     return err_check;
 }
 
-int peek_tail(linked_list_t * my_list, void ** see_data)
+int peek_tail(linked_list_t *my_list, void **see_data)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -202,7 +202,7 @@ int peek_tail(linked_list_t * my_list, void ** see_data)
     return err_check;
 }
 
-int peek_position(linked_list_t * my_list, void ** see_data,
+int peek_position(linked_list_t *my_list, void **see_data,
                   unsigned int position)
 {
     bool empty = true;
@@ -215,7 +215,7 @@ int peek_position(linked_list_t * my_list, void ** see_data,
     {
         unsigned int size = 0;
         unsigned int index = 1;
-        list_node_t * node = my_list->head;
+        list_node_t *node = my_list->head;
         err_check = size_of_list(my_list, &size);
         if ((-1 == err_check) || ((size + 1) < position))
         {
@@ -235,9 +235,9 @@ int peek_position(linked_list_t * my_list, void ** see_data,
 //******************************************************************************
 // ALL THE POP FUNCTIONS
 
-list_node_t * pop_head(linked_list_t * my_list)
+list_node_t *pop_head(linked_list_t *my_list)
 {
-    list_node_t * rtn_node = NULL;
+    list_node_t *rtn_node = NULL;
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     if (!empty && (-1 != err_check)) // if linked list is not empty and not NULL
@@ -249,14 +249,14 @@ list_node_t * pop_head(linked_list_t * my_list)
     return rtn_node;
 }
 
-list_node_t * pop_tail(linked_list_t * my_list)
+list_node_t *pop_tail(linked_list_t *my_list)
 {
-    list_node_t * rtn_node = NULL;
+    list_node_t *rtn_node = NULL;
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     if (!empty && -1 != err_check) // if linked list is not empty and not NULL
     {
-        list_node_t * node = my_list->head;
+        list_node_t *node = my_list->head;
         if (NULL == node->next) // If linked list is 1 node
         {
             rtn_node = node;
@@ -278,9 +278,9 @@ list_node_t * pop_tail(linked_list_t * my_list)
     return rtn_node;
 }
 
-list_node_t * pop_position(linked_list_t * my_list, unsigned int position)
+list_node_t *pop_position(linked_list_t *my_list, unsigned int position)
 {
-    list_node_t * del_node = NULL;
+    list_node_t *del_node = NULL;
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     if (empty || (0 == position) || (-1 == err_check))
@@ -292,7 +292,7 @@ list_node_t * pop_position(linked_list_t * my_list, unsigned int position)
         unsigned int size = 0;
         unsigned int index = 2;
         del_node = my_list->head;
-        list_node_t * node = del_node->next;
+        list_node_t *node = del_node->next;
         err_check = size_of_list(my_list, &size);
         if ((-1 == err_check) || (position > size))
         {
@@ -329,7 +329,7 @@ list_node_t * pop_position(linked_list_t * my_list, unsigned int position)
 //******************************************************************************
 // ALL THE REMOVE FUNCTIONS
 
-int remove_head(linked_list_t * my_list)
+int remove_head(linked_list_t *my_list)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -343,7 +343,7 @@ int remove_head(linked_list_t * my_list)
     }
     else
     {
-        list_node_t * node = pop_head(my_list);
+        list_node_t *node = pop_head(my_list);
         if (NULL != my_list->free_func)
             my_list->free_func(node->data);
         free(node);
@@ -351,7 +351,7 @@ int remove_head(linked_list_t * my_list)
     return err_check;
 }
 
-int remove_tail(linked_list_t * my_list)
+int remove_tail(linked_list_t *my_list)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
@@ -361,7 +361,7 @@ int remove_tail(linked_list_t * my_list)
     }
     else
     {
-        list_node_t * node = pop_tail(my_list);
+        list_node_t *node = pop_tail(my_list);
         if (NULL != my_list->free_func)
             my_list->free_func(node->data);
         free(node);
@@ -369,9 +369,9 @@ int remove_tail(linked_list_t * my_list)
     return err_check;
 }
 
-int remove_position(linked_list_t * my_list, unsigned int position)
+int remove_position(linked_list_t *my_list, unsigned int position)
 {
-    list_node_t * del_node = NULL;
+    list_node_t *del_node = NULL;
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     if (empty || (0 == position) || (-1 == err_check))
@@ -390,14 +390,14 @@ int remove_position(linked_list_t * my_list, unsigned int position)
 
 //******************************************************************************
 
-void print_list(linked_list_t * my_list)
+void print_list(linked_list_t *my_list)
 {
     bool empty = true;
     int err_check = empty_check(my_list, &empty);
     printf("[");
     if (!empty && -1 != err_check)
     {
-        list_node_t * node = my_list->head;
+        list_node_t *node = my_list->head;
         while (NULL != node->next)
         {
             my_list->print_func(node->data);
@@ -410,7 +410,7 @@ void print_list(linked_list_t * my_list)
     return;
 }
 
-void clear_list(linked_list_t ** my_list)
+void clear_list(linked_list_t **my_list)
 {
     if (NULL == my_list || NULL == (*my_list))
     {
@@ -419,7 +419,7 @@ void clear_list(linked_list_t ** my_list)
 
     while (NULL != (*my_list)->head)
     {
-        list_node_t * temp = (*my_list)->head;
+        list_node_t *temp = (*my_list)->head;
 
         // free the head node and null it
         (*my_list)->head = (*my_list)->head->next;
@@ -433,7 +433,7 @@ void clear_list(linked_list_t ** my_list)
     }
 }
 
-void destroy_list(linked_list_t ** my_list)
+void destroy_list(linked_list_t **my_list)
 {
     if (NULL == my_list)
     {
@@ -449,9 +449,9 @@ void destroy_list(linked_list_t ** my_list)
 }
 
 // Bubble Sort
-void bubble_sort(linked_list_t * my_list)
+void bubble_sort(linked_list_t *my_list)
 {
-    list_node_t * temp_node = my_list->head;
+    list_node_t *temp_node = my_list->head;
     int continuation = 0;
     do
     {
@@ -474,31 +474,31 @@ void bubble_sort(linked_list_t * my_list)
         print_list(my_list);
     }
 }
-void reset_tail(linked_list_t * my_list)
+void reset_tail(linked_list_t *my_list)
 {
-    list_node_t * node = my_list->head;
-    while (NULL!=node->next)
+    list_node_t *node = my_list->head;
+    while (NULL != node->next)
     {
-        node=node->next;
+        node = node->next;
     }
-    my_list->tail=node;
+    my_list->tail = node;
 }
 // Quick Sort
 // Insertion Sort
 // Merge Sort
 
 // Selection Sort
-void selection_sort(linked_list_t * my_list)
+void selection_sort(linked_list_t *my_list)
 {
-    list_node_t * start_node = my_list->head;
+    list_node_t *start_node = my_list->head;
     unsigned int i, j;
     int result;
     print_list(my_list);
     for (i = 0; i < my_list->size - 1; i++)
     {
-        list_node_t * curr_node = start_node->next;
+        list_node_t *curr_node = start_node->next;
         result = my_list->compare_func(start_node->data, curr_node->data);
-        list_node_t * min = (result < 0 ? start_node : curr_node);
+        list_node_t *min = (result < 0 ? start_node : curr_node);
         for (j = i + 1; j < my_list->size - 1; j++)
         {
             curr_node = curr_node->next;
@@ -515,14 +515,14 @@ void selection_sort(linked_list_t * my_list)
 }
 
 // swap nodes (for bubble sort and selection sort)
-void swap_nodes(list_node_t ** node1, list_node_t ** node2)
+void swap_nodes(list_node_t **node1, list_node_t **node2)
 {
-    void * temp_data = (*node1)->data;
+    void *temp_data = (*node1)->data;
     (*node1)->data = (*node2)->data;
     (*node2)->data = temp_data;
 }
 
-void bubble_sort_swap_nodes(linked_list_t * my_list)
+void bubble_sort_swap_nodes(linked_list_t *my_list)
 {
     unsigned int comparisons = 0;
     unsigned int swaps = 0;
@@ -530,12 +530,12 @@ void bubble_sort_swap_nodes(linked_list_t * my_list)
     for (i = 0; i < my_list->size; i++)
     {
         int continuation = 0;
-        list_node_t * start = my_list->head;
-        list_node_t * prev = NULL;
+        list_node_t *start = my_list->head;
+        list_node_t *prev = NULL;
         for (j = 0; j < ((my_list->size) - i - 1); j++)
         {
-            list_node_t * p1 = start;
-            list_node_t * p2 = start->next;
+            list_node_t *p1 = start;
+            list_node_t *p2 = start->next;
             int result = my_list->compare_func(p1->data, p2->data);
             comparisons++;
             if (result > 0)
@@ -550,7 +550,7 @@ void bubble_sort_swap_nodes(linked_list_t * my_list)
                 {
                     prev->next = p2;
                 }
-                list_node_t * temp = p2->next;
+                list_node_t *temp = p2->next;
                 p2->next = p1;
                 p1->next = temp;
             }
@@ -564,24 +564,24 @@ void bubble_sort_swap_nodes(linked_list_t * my_list)
     printf("%u comparisons, %u swaps\n", comparisons, swaps);
 }
 
-void selection_sort_node_swap(linked_list_t * my_list)
+void selection_sort_node_swap(linked_list_t *my_list)
 {
-    list_node_t * b4_start = NULL;
-    list_node_t * start_node = my_list->head;
+    list_node_t *b4_start = NULL;
+    list_node_t *start_node = my_list->head;
     unsigned int i, j;
     int result;
-    list_node_t * prev_min=NULL;
+    list_node_t *prev_min = NULL;
     printf("Original:  ");
     print_list(my_list);
     for (i = 0; i < my_list->size - 1; i++)
     {
-        list_node_t * b4_min = start_node;
-        list_node_t * b4_cur;
-        list_node_t * curr_node = start_node->next;
+        list_node_t *b4_min = start_node;
+        list_node_t *b4_cur;
+        list_node_t *curr_node = start_node->next;
         result = my_list->compare_func(start_node->data, curr_node->data);
-        list_node_t * min = (result < 0 ? start_node : curr_node);
-        
-        for (j = i + 1; j < my_list->size-1; j++)
+        list_node_t *min = (result < 0 ? start_node : curr_node);
+
+        for (j = i + 1; j < my_list->size - 1; j++)
         {
             b4_cur = curr_node;
             curr_node = curr_node->next;
@@ -591,15 +591,14 @@ void selection_sort_node_swap(linked_list_t * my_list)
                 b4_min = b4_cur;
                 min = curr_node;
             }
-
         }
         if (start_node == min)
         {
-            start_node=start_node->next;
+            start_node = start_node->next;
             printf("No swap:   ");
             print_list(my_list);
             prev_min = min;
-            if (1==check_sorted(my_list))
+            if (1 == check_sorted(my_list))
             {
                 printf("Sorted:    ");
                 print_list(my_list);
@@ -612,19 +611,19 @@ void selection_sort_node_swap(linked_list_t * my_list)
         {
             my_list->head = min;
         }
-        b4_min->next=start_node;
-        list_node_t * temp = start_node->next;
-        start_node->next=min->next;
+        b4_min->next = start_node;
+        list_node_t *temp = start_node->next;
+        start_node->next = min->next;
         printf("Swap:      ");
-        start_node = temp;  
-        b4_start=min;
-        b4_start->next=start_node;
-        if (NULL!=prev_min)
+        start_node = temp;
+        b4_start = min;
+        b4_start->next = start_node;
+        if (NULL != prev_min)
         {
             prev_min->next = min;
-            prev_min=min;
+            prev_min = min;
         }
-        else if (start_node!=min)
+        else if (start_node != min)
         {
             prev_min = min;
         }
@@ -634,84 +633,83 @@ void selection_sort_node_swap(linked_list_t * my_list)
     print_list(my_list);
     reset_tail(my_list);
 }
-int check_sorted(linked_list_t * my_list)
+int check_sorted(linked_list_t *my_list)
 {
-    int sorted=1;
-    list_node_t * first=my_list->head;
+    int sorted = 1;
+    list_node_t *first = my_list->head;
     for (unsigned int i = 0; i < my_list->size - 1; i++)
     {
-        list_node_t * second = first->next;
-        if (my_list->compare_func(first->data,second->data)>0)
+        list_node_t *second = first->next;
+        if (my_list->compare_func(first->data, second->data) > 0)
         {
-            sorted=0;
+            sorted = 0;
             break;
         }
-        first=second;
+        first = second;
     }
     return sorted;
 }
 
-void insertion_sort(linked_list_t * my_list)
+void insertion_sort(linked_list_t *my_list)
 {
-    list_node_t * last_sorted =  my_list->head;
-    list_node_t * curr_node = last_sorted->next;
-    list_node_t * temp;
-    list_node_t * check_node;
-    list_node_t *  prev_check;
-    for (unsigned int i = 0; i < my_list->size-1;i++)
+    list_node_t *last_sorted = my_list->head;
+    list_node_t *curr_node = last_sorted->next;
+    list_node_t *temp;
+    list_node_t *check_node;
+    list_node_t *prev_check;
+    for (unsigned int i = 0; i < my_list->size - 1; i++)
     {
-        
-        int result=my_list->compare_func(last_sorted->data,curr_node->data);
-        if (result>0)
+
+        int result = my_list->compare_func(last_sorted->data, curr_node->data);
+        if (result > 0)
         {
-            check_node=my_list->head;
-            prev_check=NULL;
+            check_node = my_list->head;
+            prev_check = NULL;
             do
             {
-                if (NULL==prev_check)
+                if (NULL == prev_check)
                 {
-                    if(my_list->compare_func(check_node->data,curr_node->data)>0)
+                    if (my_list->compare_func(check_node->data, curr_node->data) > 0)
                     {
-                        temp=curr_node->next;
-                        curr_node->next=check_node;
+                        temp = curr_node->next;
+                        curr_node->next = check_node;
                         last_sorted->next = temp;
-                        my_list->head=curr_node;
+                        my_list->head = curr_node;
                         break;
                     }
                     else
                     {
-                        prev_check=check_node;
-                        check_node=check_node->next;
+                        prev_check = check_node;
+                        check_node = check_node->next;
                     }
                 }
-                else if (my_list->compare_func(check_node->data,curr_node->data)>0)
+                else if (my_list->compare_func(check_node->data, curr_node->data) > 0)
                 {
                     temp = curr_node->next;
-                    prev_check->next=curr_node;
-                    curr_node->next=check_node;
-                    last_sorted->next=temp;
+                    prev_check->next = curr_node;
+                    curr_node->next = check_node;
+                    last_sorted->next = temp;
                     break;
                 }
                 else
                 {
-                    prev_check=check_node;
-                    check_node=check_node->next;
+                    prev_check = check_node;
+                    check_node = check_node->next;
                 }
-            }while (my_list->compare_func(prev_check->data,curr_node->data)<0);
-            curr_node=last_sorted->next;
+            } while (my_list->compare_func(prev_check->data, curr_node->data) < 0);
+            curr_node = last_sorted->next;
         }
         else
         {
-            last_sorted=curr_node;
-            curr_node=curr_node->next;
+            last_sorted = curr_node;
+            curr_node = curr_node->next;
         }
         reset_tail(my_list);
         print_list(my_list);
-        if (1==check_sorted(my_list))
+        if (1 == check_sorted(my_list))
         {
             printf("Sorted\n");
             return;
         }
     }
 }
-

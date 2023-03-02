@@ -9,4 +9,7 @@ add_subdirectory(deps)
 add_subdirectory(circular_double)
 add_subdirectory(singly_linked_list)
 add_subdirectory(doubly_linked_list)
-# add_subdirectory(thread_pool)
+add_subdirectory(thread_pool)
+
+# Disable response files
+set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES Off)

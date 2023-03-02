@@ -5,17 +5,11 @@
 extern "C"
 {
 #endif
-#include <exit_codes.h>
-struct thread_pool;
-typedef struct thread_pool thread_pool_t;
-
-typedef void (*thread_func_t)(void *arg);
-
-thread_pool_t *thread_pool_init(size_t thread_count);
-exit_code_t thread_pool_destroy(thread_pool_t *t_pool);
-
-exit_code_t thread_pool_add_work(thread_pool_t *t_pool, thread_func_t func, void *arg);
-exit_code_t thread_pool_wait(thread_pool_t *t_pool);
+#include "exit_codes.h"
+    typedef struct thread_pool thread_pool_t;
+    thread_pool_t *tpool_init(int threads, void (*free_func)(void *));
+    exit_code_t shutdown(thread_pool_t *tpool);
+    exit_code_t tpool_destroy(thread_pool_t *tpool);
 
 #ifdef __cplusplus
 }

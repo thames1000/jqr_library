@@ -26,7 +26,7 @@ typedef enum exit_code
     E_OUT_OF_BOUNDS,
     E_OUT_OF_ORDER,
 
-    //OS
+    // OS
     E_FORK_ERROR,
 
     // Network
@@ -55,7 +55,6 @@ typedef enum exit_code
     // Linked List
     E_TOO_SMALL, // Position is less than size of list
     E_TOO_BIG,   // Position is greater than size of list
-
 } exit_code_t;
 
 // struct using custom err_codes_t to print related error messages
@@ -64,9 +63,8 @@ typedef struct exit_message exit_message_t;
 /**
  * @brief function to print custom exit messages.
  *
-* @param exit_code exit code by which to find the message string.
-*/
+ * @param exit_code exit code by which to find the message string.
+ */
 void print_exit_message(exit_code_t exit_code);
 
 #endif
-
