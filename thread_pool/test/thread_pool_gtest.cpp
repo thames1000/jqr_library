@@ -15,29 +15,40 @@ void add_stuff(void *temp_val)
     temp_t *temp = (temp_t *)temp_val;
     printf("%d + %d = %d\n", temp->a, temp->b, temp->a + temp->b);
 }
+void sub_stuff(void *temp_val)
+{
+    temp_t *temp = (temp_t *)temp_val;
+    printf("%d - %d = %d\n", temp->a, temp->b, temp->a - temp->b);
+}
+void mul_stuff(void *temp_val)
+{
+    temp_t *temp = (temp_t *)temp_val;
+    printf("%d * %d = %d\n", temp->a, temp->b, temp->a * temp->b);
+}
+void div_stuff(void *temp_val)
+{
+    temp_t *temp = (temp_t *)temp_val;
+    printf("%d / %d = %d\n", temp->a, temp->b, temp->a / temp->b);
+}
 
 TEST(BaseTest, Initialize_and_Destroy_Func)
 {
-    thread_pool_t *tpool = tpool_init(3, NULL);
+    thread_pool_t *tpool = tpool_init(3);
     EXPECT_NE(tpool, nullptr);
     exit_code_t ret_val = tpool_destroy(tpool);
     EXPECT_EQ(ret_val, E_SUCCESS);
 }
 
-TEST(BaseTest, Add_Five_Jobs)
+TEST(BaseTest, Add_Jobs)
 {
     temp_t *val = (temp_t *)calloc(1, sizeof(temp_t));
-    val->a = 2;
-    val->b = 5;
-    thread_pool_t *tpool = tpool_init(5, add_stuff);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
-    tpool_add_work(tpool, val);
+    val->a = 6;
+    val->b = 3;
+    thread_pool_t *tpool = tpool_init(5);
+    tpool_add_work(tpool, val, add_stuff);
+    tpool_add_work(tpool, val, sub_stuff);
+    tpool_add_work(tpool, val, mul_stuff);
+    tpool_add_work(tpool, val, div_stuff);
     tpool_destroy(tpool);
     free(val);
 }
