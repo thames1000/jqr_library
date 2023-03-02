@@ -9,6 +9,7 @@ target_link_libraries(
         thread_pool_gtest
         PUBLIC
         thread_pool
+        queue
         gtest
         gtest_main
 )
@@ -22,5 +23,6 @@ target_compile_options(
         -Wvla
         -Wfloat-equal
         -Werror
+        -pthread
 )
 gtest_discover_tests(thread_pool_gtest)
