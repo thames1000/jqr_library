@@ -72,3 +72,13 @@ void queue_dump(queue_t *queue)
 {
     clear_list(&queue);
 }
+
+unsigned int size_of_queue(queue_t *my_queue)
+{
+    unsigned int queue_size = 0;
+    if (NULL != my_queue)
+    {
+        size_of_list(my_queue, &queue_size);
+    }
+    return queue_size;
+}

@@ -23,52 +23,52 @@
             fprintf(stderr, fmt, __VA_ARGS__); \
     } while (0)
 
-typedef struct thread_func
-{
-    void (*function)(void *);
-} thread_func_t;
-
 /*
  * Thread Pool Struct
  */
 typedef struct thread_pool
 {
-    atomic_uint_fast8_t keep_alive;
-    atomic_uint_fast8_t num_threads;
-    int max_threads;
-    queue_t *work_queue;
-    atomic_uint_fast64_t job_count;
+    atomic_uint_fast8_t keep_alive;  // flag for keeping threads active (1 or 0)
+    atomic_uint_fast8_t num_threads; // number of threads currently active
+    int max_threads;                 // initial Max thread count
+    queue_t *work_queue;             // Queue for work to be added to
     pthread_t **thread_list;
     pthread_mutex_t mutex;
     pthread_cond_t condition;
     pthread_condattr_t cattr;
+    void (*work_function)(void *);
 } thread_pool_t;
 
 void *startThread(void *thread_pool)
 {
-    debug_print("startThread Called%s \n", "");
     thread_pool_t *tpool = (thread_pool_t *)thread_pool;
-
-    while (0 != atomic_load(&tpool->keep_alive))
+    for (;;)
     {
         pthread_mutex_lock(&tpool->mutex);
-        if (atomic_load(&tpool->job_count))
+        while (0 == size_of_queue(tpool->work_queue))
         {
+            if (0 == tpool->keep_alive)
+            {
+                pthread_mutex_unlock(&tpool->mutex);
+                tpool->num_threads--;
+                return NULL;
+            }
             pthread_cond_wait(&tpool->condition, &tpool->mutex);
-            pthread_mutex_unlock(&tpool->mutex);
-            continue;
         }
         void *work = dequeue(tpool->work_queue);
-        pthread_mutex_unlock(&(tpool->mutex));
-        // work->work_func; ###### DO WORK #######
+        pthread_mutex_unlock(&tpool->mutex);
+        if (NULL != tpool->work_function)
+        {
+            tpool->work_function(work);
+        }
     }
-    atomic_fetch_sub(&tpool->num_threads, 1);
+    return NULL;
 }
 
 /*
  * Thread Pool Struct Init
  */
-thread_pool_t *tpool_init(int threads, void (*free_func)(void *))
+thread_pool_t *tpool_init(int threads, void (*work_func)(void *))
 {
     thread_pool_t *tpool = calloc(1, sizeof(*tpool));
     CHECK_NULL(tpool, goto CLEANUP);
@@ -76,7 +76,7 @@ thread_pool_t *tpool_init(int threads, void (*free_func)(void *))
     tpool->mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
     tpool->condition = (pthread_cond_t)PTHREAD_COND_INITIALIZER;
 
-    tpool->work_queue = queue_init(free_func, NULL, NULL);
+    tpool->work_queue = queue_init(NULL, NULL, NULL);
     CHECK_NULL(tpool->work_queue, goto TPOOL_CLEANUP);
 
     tpool->thread_list = calloc(threads, sizeof(pthread_t *));
@@ -86,8 +86,7 @@ thread_pool_t *tpool_init(int threads, void (*free_func)(void *))
     tpool->num_threads = threads;
     tpool->max_threads = threads;
 
-    tpool->job_count = 0;
-
+    tpool->work_function = work_func;
     for (int i = 0; i < threads; i++)
     {
         if (0 != pthread_create(&(tpool->thread_list[i]), NULL, startThread, tpool))
@@ -104,10 +103,10 @@ CLEANUP:
     return NULL;
 }
 
-exit_code_t shutdown(thread_pool_t *tpool)
+static exit_code_t shutdown(thread_pool_t *tpool)
 {
     CHECK_NULL(tpool, return E_NULL_POINTER);
-    atomic_fetch_sub(&tpool->keep_alive, 1);
+    tpool->keep_alive--;
 
     pthread_cond_broadcast(&tpool->condition);
 
@@ -123,42 +122,25 @@ exit_code_t shutdown(thread_pool_t *tpool)
  */
 exit_code_t tpool_destroy(thread_pool_t *tpool)
 {
-    exit_code_t ret_val = shutdown(tpool);
     if (NULL == tpool)
     {
         fprintf(stderr, "Nothing to destroy\n");
         return E_NULL_POINTER;
     }
+    shutdown(tpool);
     free(tpool->thread_list);
     queue_destroy(tpool->work_queue);
     free(tpool);
     return E_SUCCESS;
 }
 
-// Shutdown
-/*
- * Worker Function
- * # while(atomic_load(keep_alive))
- * # {
- * #    pthread_mutex_lock(mutex);
- * #    if (atomic_load(empty_queue))
- * #    {
- * #        mutex_wait(condition);
- * #        pthread_mutex_unlock(mutex);
- * #        continue;
- * #    }
- * #    work = dequeue(work_queue);
- * #    pthread_mutex_unlock(mutex);
- * #    work->work_func; ###### DO WORK #######
- * # }
- * # --num_threads;
- * # return NULL;
- */
-
-/*
- * Add to Queue
- * # pthread_mutex_lock(mutex);
- * # enqueue(work_queue, work);
- * # pthread_mutex_unlock(mutex);
- * # pthread_signal(condition);
- */
+void tpool_add_work(thread_pool_t *tpool, void *work)
+{
+    if (NULL != tpool->work_queue)
+    {
+        pthread_mutex_lock(&tpool->mutex);
+        enqueue(tpool->work_queue, work);
+        pthread_mutex_unlock(&tpool->mutex);
+        pthread_cond_signal(&tpool->condition);
+    }
+}

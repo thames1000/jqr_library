@@ -26,6 +26,15 @@ extern "C"
     /**
      * @brief
      *
+     * @param my_queue
+     * @param queue_size
+     * @return int
+     */
+    unsigned int size_of_queue(queue_t *my_queue);
+
+    /**
+     * @brief
+     *
      * @param queue
      */
     void queue_destroy(queue_t *queue);
