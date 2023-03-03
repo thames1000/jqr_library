@@ -44,7 +44,7 @@ TEST(BaseTest, Add_Jobs)
     temp_t *val = (temp_t *)calloc(1, sizeof(temp_t));
     val->a = 6;
     val->b = 3;
-    thread_pool_t *tpool = tpool_init(5);
+    thread_pool_t *tpool = tpool_init(4);
     tpool_add_work(tpool, val, add_stuff);
     tpool_add_work(tpool, val, sub_stuff);
     tpool_add_work(tpool, val, mul_stuff);

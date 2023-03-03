@@ -1,0 +1,26 @@
+enable_testing()
+include(GoogleTest)
+
+add_executable(
+    hashmap_gtest
+    hashmap_gtest.cpp
+)
+target_link_libraries(
+    hashmap_gtest
+    PUBLIC
+    hashmap
+    gtest
+    gtest_main
+)
+target_compile_options(
+    hashmap_gtest
+    PUBLIC
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wformat
+    -Wvla
+    -Wfloat-equal
+    -Werror
+)
+gtest_discover_tests(hashmap_gtest)
