@@ -19,7 +19,9 @@ typedef struct hash_table
     data_point_t **table;
     uint64_t max_size;
     uint64_t spots_used;
+    uint64_t items_in_table;
     void (*free_func)(void *);
+    void (*print_func)(void *);
 } hash_table_t;
 
 /**
@@ -33,16 +35,15 @@ typedef struct hash_table
     return hash
 */
 // Modified from code found at below location
-// SOURCE: https://www.programmingalgorithms.com/algorithm/fnv-hash/c/
+// SOURCE: https://benhoyt.com/writings/hash-table-in-c/
 uint64_t FNVHash(void *data, uint64_t length)
 {
     uint64_t hash = FNV_OFFSET;
-    uint64_t i = 0;
     unsigned char *str = (unsigned char *)data;
-    for (i = 0; i < length; str++, i++)
+    for (uint64_t i = 0; i < length; str++, i++)
     {
+        hash ^= (uint64_t)(*str);
         hash *= FNV_PRIME;
-        hash ^= (*str);
     }
     return hash;
 }
@@ -83,6 +84,7 @@ exit_code_t hash_insert(void *data, uint32_t size, hash_table_t *h_table)
     if (NULL == h_table->table[idx])
     {
         h_table->table[idx] = value;
+        h_table->spots_used++;
     }
     else
     {
@@ -93,6 +95,7 @@ exit_code_t hash_insert(void *data, uint32_t size, hash_table_t *h_table)
         }
         temp->overflow = value;
     }
+    h_table->items_in_table++;
     return E_SUCCESS;
 }
 
@@ -104,7 +107,40 @@ exit_code_t hash_insert(void *data, uint32_t size, hash_table_t *h_table)
 // {
 // }
 
-hash_table_t *hash_table_init(uint64_t size, void (*free_func)(void *))
+void display(hash_table_t *h_table)
+{
+    if (NULL == h_table->print_func)
+    {
+        fprintf(stderr, "No print function provided\n");
+        return;
+    }
+    uint64_t i = 0;
+    printf("[");
+    for (i = 0; i < h_table->max_size; i++)
+    {
+        if (NULL != h_table->table[i])
+        {
+            printf("(");
+            h_table->print_func(h_table->table[i]->data);
+            data_point_t *temp = h_table->table[i]->overflow;
+            while (NULL != temp)
+            {
+                printf("-->");
+                h_table->print_func(temp->data);
+                temp = temp->overflow;
+            }
+            printf(")");
+        }
+        else
+            printf(" ~~ ");
+        if (h_table->max_size - 1 != i)
+            printf(", ");
+    }
+
+    printf("]\n");
+}
+
+hash_table_t *hash_table_init(uint64_t size, void (*free_func)(void *), void (*print_func)(void *))
 {
     if (0 == size)
     {
@@ -127,6 +163,7 @@ hash_table_t *hash_table_init(uint64_t size, void (*free_func)(void *))
         h_table->table[index] = NULL;
     }
     h_table->free_func = free_func;
+    h_table->print_func = print_func;
     h_table->max_size = size;
     h_table->spots_used = 0;
     return h_table;
