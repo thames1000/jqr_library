@@ -14,3 +14,6 @@ add_subdirectory(hashmap)
 
 # Disable response files
 set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES Off)
+
+# add_library(dsa_lib INTERFACE)
+# target_link_libraries(dsa_lib INTERFACE hashmap cdll stack queue singly_linked_list doubly_linked_list thread_pool)
