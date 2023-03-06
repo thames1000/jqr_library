@@ -13,10 +13,9 @@ extern "C"
      *
      * @param threads - number of threads to be made
      * @param work_func - Function that each thread should perform
-     * @param free_func - Function for freeing the data for the jobs going in the work queue
      * @return thread_pool_t*
      */
-    thread_pool_t *tpool_init(int threads);
+    thread_pool_t *tpool_init(const int threads);
 
     /**
      * @brief
@@ -31,8 +30,9 @@ extern "C"
      *
      * @param tpool
      * @param work
+     * @param free_func - Function for freeing the arg for the jobs
      */
-    void tpool_add_work(thread_pool_t *tpool, void *work, void (*work_func)(void *));
+    void tpool_add_work(thread_pool_t *tpool, void *work, void (*work_function)(void *), void (*free_func)(void *));
 
 #ifdef __cplusplus
 }
