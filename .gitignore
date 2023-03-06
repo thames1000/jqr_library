@@ -53,3 +53,7 @@ dkms.conf
 build/
 .clang-tidy
 .vscode/
+py_client/empty.txt
+c_server/empty.txt
+adjacency_matrix/empty.txt
+adjacency_list/empty.txt
