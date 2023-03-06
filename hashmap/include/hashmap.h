@@ -57,7 +57,7 @@ extern "C"
      *
      * @param h_table hash_table_t object to remove the key value pair from
      * @param key a NULL-terminated const char* used for lookup and removal
-     * @return exit_code_t
+     * @return exit_code_t E_SUCCESS if item was successfully removed, E_KEY_NOT_FOUND if key is not in hash_table_t
      */
     exit_code_t hash_remove(hash_table_t *h_table, const char *key);
 
