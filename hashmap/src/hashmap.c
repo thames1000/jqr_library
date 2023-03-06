@@ -68,7 +68,6 @@ data_point_t *make_data_point(const char *key, void *value)
     }
     ret_data_point->key = key;
     ret_data_point->value = value;
-    ret_data_point->overflow = NULL;
     return ret_data_point;
 }
 
@@ -211,15 +210,9 @@ hash_table_t *hash_table_init(uint64_t size, void (*free_func)(void *), void (*p
         free(h_table);
         return NULL;
     }
-    // Explicitly setting each index in the table to NULL
-    for (int index = 0; index < size; index++)
-    {
-        h_table->table[index] = NULL;
-    }
     h_table->free_func = free_func;
     h_table->print_func = print_func;
     h_table->max_size = size;
-    h_table->spots_used = 0;
     return h_table;
 }
 
