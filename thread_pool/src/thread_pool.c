@@ -27,6 +27,7 @@ typedef struct job
 {
     void *arg;
     void (*worker_function)(void *);
+    void (*free_func)(void *);
 } job_t;
 /*
  * Thread Pool Struct
@@ -37,15 +38,18 @@ typedef struct thread_pool
     atomic_uint_fast8_t num_threads; // number of threads currently active
     int max_threads;                 // initial Max thread count
     queue_t *work_queue;             // Queue for work to be added to
-    pthread_t **thread_list;         // List of active threads
+    pthread_t *thread_list;          // List of active threads
     pthread_mutex_t mutex;
     pthread_cond_t condition;
-    pthread_condattr_t cattr;
 } thread_pool_t;
 
-void *startThread(void *thread_pool)
+static void *startThread(void *thread_pool)
 {
     thread_pool_t *tpool = (thread_pool_t *)thread_pool;
+    if (NULL == tpool)
+    {
+        goto END;
+    }
     for (;;)
     {
         pthread_mutex_lock(&tpool->mutex);
@@ -55,7 +59,7 @@ void *startThread(void *thread_pool)
             {
                 pthread_mutex_unlock(&tpool->mutex);
                 tpool->num_threads--;
-                return NULL;
+                goto END;
             }
             pthread_cond_wait(&tpool->condition, &tpool->mutex);
         }
@@ -66,27 +70,40 @@ void *startThread(void *thread_pool)
         {
             job->worker_function(job->arg);
         }
+        if (NULL != job->free_func)
+        {
+            job->free_func(job->arg);
+        }
         free(job);
     }
+END:
     return NULL;
 }
 
 /*
  * Thread Pool Struct Init
  */
-thread_pool_t *tpool_init(int threads)
+thread_pool_t *tpool_init(const int threads)
 {
     thread_pool_t *tpool = calloc(1, sizeof(*tpool));
     CHECK_NULL(tpool, goto CLEANUP);
 
-    tpool->mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
-    tpool->condition = (pthread_cond_t)PTHREAD_COND_INITIALIZER;
+    if (0 != pthread_mutex_init(&tpool->mutex, NULL))
+    {
+        fprintf(stderr, "Mutex init error\n");
+        goto MUTEX_FAILURE;
+    }
+    if (0 != pthread_cond_init(&tpool->condition, NULL))
+    {
+        fprintf(stderr, "condition init error\n");
+        goto COND_FAILURE;
+    }
 
     tpool->work_queue = queue_init(NULL, NULL, NULL);
-    CHECK_NULL(tpool->work_queue, goto TPOOL_CLEANUP);
+    CHECK_NULL(tpool->work_queue, goto QUEUE_FAILURE);
 
-    tpool->thread_list = calloc(threads, sizeof(pthread_t *));
-    CHECK_NULL(tpool->thread_list, goto QUEUE_CLEANUP);
+    tpool->thread_list = calloc(threads, sizeof(pthread_t));
+    CHECK_NULL(tpool->thread_list, goto THREAD_LIST_FAILURE);
 
     tpool->keep_alive = 1;
     tpool->num_threads = threads;
@@ -94,15 +111,19 @@ thread_pool_t *tpool_init(int threads)
 
     for (int i = 0; i < threads; i++)
     {
-        if (0 != pthread_create(&(tpool->thread_list[i]), NULL, startThread, tpool))
+        if (0 != pthread_create(&tpool->thread_list[i], NULL, startThread, tpool))
         {
             fprintf(stderr, "Failed to create thread %d\n", i);
         }
     }
     return tpool;
-QUEUE_CLEANUP:
+THREAD_LIST_FAILURE:
     queue_destroy(tpool->work_queue);
-TPOOL_CLEANUP:
+QUEUE_FAILURE:
+    pthread_mutex_destroy(&tpool->mutex);
+MUTEX_FAILURE:
+    pthread_cond_destroy(&tpool->condition);
+COND_FAILURE:
     free(tpool);
 CLEANUP:
     return NULL;
@@ -135,11 +156,16 @@ exit_code_t tpool_destroy(thread_pool_t *tpool)
     return E_SUCCESS;
 }
 
-void tpool_add_work(thread_pool_t *tpool, void *work, void (*work_function)(void *))
+void tpool_add_work(thread_pool_t *tpool, void *arg, void (*work_function)(void *), void (*free_func)(void *))
 {
     job_t *new_job = calloc(1, sizeof(*new_job));
-    new_job->arg = work;
+    if (NULL == new_job)
+    {
+        return;
+    }
+    new_job->arg = arg;
     new_job->worker_function = work_function;
+    new_job->free_func = free_func;
     if (NULL != tpool->work_queue)
     {
         pthread_mutex_lock(&tpool->mutex);

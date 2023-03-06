@@ -45,10 +45,10 @@ TEST(BaseTest, Add_Jobs)
     val->a = 6;
     val->b = 3;
     thread_pool_t *tpool = tpool_init(4);
-    tpool_add_work(tpool, val, add_stuff);
-    tpool_add_work(tpool, val, sub_stuff);
-    tpool_add_work(tpool, val, mul_stuff);
-    tpool_add_work(tpool, val, div_stuff);
+    tpool_add_work(tpool, val, add_stuff, NULL);
+    tpool_add_work(tpool, val, sub_stuff, NULL);
+    tpool_add_work(tpool, val, mul_stuff, NULL);
+    tpool_add_work(tpool, val, div_stuff, NULL);
     tpool_destroy(tpool);
     free(val);
 }

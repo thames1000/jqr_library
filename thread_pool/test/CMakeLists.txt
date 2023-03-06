@@ -4,6 +4,7 @@ include(GoogleTest)
 add_executable(
         thread_pool_gtest
         thread_pool_gtest.cpp
+        ${PROJECT_SOURCE_DIR}/exit_codes/src/exit_codes.c
 )
 target_link_libraries(
         thread_pool_gtest

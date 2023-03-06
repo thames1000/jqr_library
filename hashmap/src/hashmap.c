@@ -38,24 +38,23 @@ typedef struct hash_table
 */
 // Modified from code found at below location
 // SOURCE: https://benhoyt.com/writings/hash-table-in-c/
-uint64_t FNVHash(const char *key, uint64_t length)
+static uint64_t FNVHash(const char *key, uint64_t length)
 {
     uint64_t hash = FNV_OFFSET;
-    unsigned char *str = (unsigned char *)key;
-    for (uint64_t i = 0; i < length; str++, i++)
+    for (uint64_t i = 0; i < length; i++)
     {
-        hash ^= (uint64_t)(*str);
+        hash ^= key[i];
         hash *= FNV_PRIME;
     }
     return hash;
 }
-uint64_t get_index(const char *key, hash_table_t *h_table)
+static uint64_t get_index(const char *key, const hash_table_t *h_table)
 {
-    if (NULL == key)
+    if ((NULL == h_table) || (NULL == key))
     {
-        return 0;
+        return UINT64_MAX;
     }
-    uint64_t size = strlen(key);
+    uint64_t size = strlen(key); // Check String is NULL Terminated
     uint64_t hash = FNVHash(key, size);
     return (hash % h_table->max_size);
 }
@@ -73,9 +72,9 @@ data_point_t *make_data_point(const char *key, void *value)
     return ret_data_point;
 }
 
-exit_code_t hash_insert(const char *key, void *value, hash_table_t *h_table)
+exit_code_t hash_insert(hash_table_t *h_table, const char *key, void *value)
 {
-    if ((NULL == value) || (NULL == key))
+    if ((NULL == h_table) || (NULL == value) || (NULL == key))
     {
         return E_NULL_POINTER;
     }
@@ -103,14 +102,14 @@ exit_code_t hash_insert(const char *key, void *value, hash_table_t *h_table)
     return E_SUCCESS;
 }
 
-void *hash_search(hash_table_t *h_table, const char *key)
+void *hash_search(const hash_table_t *h_table, const char *key)
 {
     if ((NULL == h_table) || (NULL == key))
     {
         return NULL;
     }
     uint64_t index = get_index(key, h_table);
-    if (0 == index)
+    if (h_table->max_size < index)
     {
         return NULL;
     }
@@ -161,7 +160,7 @@ exit_code_t hash_remove(hash_table_t *h_table, const char *key)
     return E_KEY_NOT_FOUND;
 }
 
-void display(hash_table_t *h_table)
+void display(const hash_table_t *h_table)
 {
     if (NULL == h_table->print_func)
     {
@@ -224,21 +223,19 @@ hash_table_t *hash_table_init(uint64_t size, void (*free_func)(void *), void (*p
     return h_table;
 }
 
-void clear_overflow(data_point_t *data, void (*free_func)(void *))
+static void clear_overflow(data_point_t *data, void (*free_func)(void *))
 {
     if (NULL == data)
     {
         return;
     }
-    if (NULL != data->overflow)
-    {
-        clear_overflow(data->overflow, free_func);
-    }
+    data_point_t *next = data->overflow;
     if (NULL != free_func)
     {
         free_func(data->value);
     }
     free(data);
+    clear_overflow(next, free_func);
 }
 
 exit_code_t hash_table_destroy(hash_table_t *h_table)
