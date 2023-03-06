@@ -156,14 +156,14 @@ exit_code_t tpool_destroy(thread_pool_t *tpool)
     return E_SUCCESS;
 }
 
-void tpool_add_work(thread_pool_t *tpool, void *work, void (*work_function)(void *), void (*free_func)(void *))
+void tpool_add_work(thread_pool_t *tpool, void *arg, void (*work_function)(void *), void (*free_func)(void *))
 {
     job_t *new_job = calloc(1, sizeof(*new_job));
     if (NULL == new_job)
     {
         return;
     }
-    new_job->arg = work;
+    new_job->arg = arg;
     new_job->worker_function = work_function;
     new_job->free_func = free_func;
     if (NULL != tpool->work_queue)
